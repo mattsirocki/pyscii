@@ -24,6 +24,16 @@ def error(message):
 # Template Retriever
 #
 
+def save(style, path):
+    output = {}
+
+    for x in style:
+        template = style[x].strip('\n')
+        output[x] = (template_width(template), template_height(template), template)
+
+    with open(path, 'wb') as f:
+        pickle.dump(output, f)
+
 def get_letter(letter, style):
     url = 'http://www.network-science.de/ascii/ascii.php?TEXT={}&FONT={}&RICH=no&FORM=left'.format(letter, style)
 
@@ -39,7 +49,6 @@ def get_style(style_name):
 
     try:
         with open(style_file, 'rb') as f:
-            print 'Loading Style', style_name
             return pickle.load(f)
     except:
         print 'Stealing Style', style_name
@@ -70,7 +79,7 @@ def template_height(template):
 # Money Maker
 #
 
-def format(text, style, dx, dy):
+def format(text, style, dx, dy, style_x):
     x, y, min_x, min_y, max_x, max_y = 0, 0, 0, 0, 0, 0
 
     output = collections.defaultdict(lambda: collections.defaultdict(lambda: ' '))
@@ -94,6 +103,9 @@ def format(text, style, dx, dy):
 
     for _letter, letter in enumerate(text):
         template_x, template_y, template = style[letter]
+
+        if style_x is not None:
+            template_x = style_x
 
         min_x, min_y = min(min_x, x), min(min_y, y)
 
@@ -119,9 +131,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('text',                                     help='text to format')
     parser.add_argument('-x', action='store',      default='0',       help='x offset')
+    parser.add_argument('--style-x', action='store', default=None, help='style x offset', type=int)
     parser.add_argument('-y', action='store',      default='0',       help='y offset')
     parser.add_argument('--style', action='store', default='ascii', help='style name')
 
     arguments = parser.parse_args()
 
-    format(arguments.text, arguments.style, arguments.x, arguments.y)
+    format(arguments.text, arguments.style, arguments.x, arguments.y, arguments.style_x)
