@@ -1,9 +1,14 @@
 #!/usr/bin/python -u
 
-import argparse, stylestealer, sys
-import contextlib, os, pickle, re, string, sys, urllib2
-import re
+import argparse
 import collections
+import contextlib
+import os
+import pickle
+import re
+import string
+import sys
+import urllib2
 
 PRE = re.compile(r'<pre>(.*?)</pre>', re.I | re.S)
 
@@ -42,9 +47,9 @@ def get_style(style_name):
     style = {}
     print ' ',
     for letter in string.ascii_letters + '`1234567890-=~!@#$%^&*()_+[]{},.<>/?\'"\\|':
-        print letter,
+        sys.stdout.write(letter)
         style[letter] = get_letter(letter, style_name)
-    print
+    sys.stdout.write('\n')
 
     with open(style_file, 'wb')  as f:
         pickle.dump(style, f)
@@ -107,7 +112,8 @@ def format(text, style, dx, dy):
     for y in range(min_y, max_y):
         for x in range(min_x, max_x):
             sys.stdout.write(output[y][x])
-        sys.stdout.write('\n')
+        if y < max_y - 1:
+            sys.stdout.write('\n')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
